@@ -46,23 +46,6 @@ def process_frame(frame, yolo_model, predictor):
     
     return masks
 
-# def mask2img(mask):
-#     palette = {
-#         0: (0, 0, 0),
-#         1: (255, 0, 0),
-#         2: (0, 255, 0),
-#         3: (0, 0, 255),
-#         4: (0, 255, 255),
-#     }
-    
-#     palette_tensor = torch.tensor([palette[x] for x in mask.flatten()], dtype=torch.uint8)
-#     image = palette_tensor.reshape(mask.shape[0], mask.shape[1], 3)
-#     return image
-
-# def show_mask(masks):
-#     mask_images = [mask2img(torch.squeeze(mask).cpu().numpy()) for mask in masks]
-#     combined_mask = torch.sum(torch.stack(mask_images, dim=0), dim=0)
-#     return combined_mask.detach().cpu().numpy()
 
 def optimized_mask2img(mask):
     palette = {
@@ -143,26 +126,30 @@ if __name__ == '__main__':
             masks = process_frame(frame, yolo_model, predictor)
             #dispaly frame and colour mask in same window
             frame = ((frame/np.max(frame))*255).astype(np.uint8)
+         
+            if masks is not None:        
         
-            
-            colour_mask = optimized_show_mask(masks.detach().cpu().numpy())
+                colour_mask = optimized_show_mask(masks.detach().cpu().numpy())
        
-            colour_mask = cv2.addWeighted(colour_mask.astype(np.uint8), 0.3, frame, 0.7, 0, dtype=cv2.CV_8U)#colour_mask.astype(np.uint8))
+                colour_mask = cv2.addWeighted(colour_mask.astype(np.uint8), 0.3, frame, 0.7, 0, dtype=cv2.CV_8U)#colour_mask.astype(np.uint8))
                 
-            #-----------for contours -------
-            masks = np.squeeze(masks.detach().cpu().numpy(), axis = 1).astype(np.uint8)
-            #print('masks shape: ', masks.shape, masks.shape[0], np.unique(masks))
-            for dim in range(masks.shape[0]):
-                #print('in shape: ', masks[dim, :, :].shape)
-                contours, hierarchy = cv2.findContours(image = masks[dim, :, :], mode = cv2.RETR_TREE, method = cv2.CHAIN_APPROX_NONE)
-                cv2.drawContours(image = frame, contours=contours, contourIdx=-1, color=(0, 255, 0), thickness=1, lineType=cv2.LINE_AA)
+                #-----------for contours -------
+                masks = np.squeeze(masks.detach().cpu().numpy(), axis = 1).astype(np.uint8)
+                #print('masks shape: ', masks.shape, masks.shape[0], np.unique(masks))
+                for dim in range(masks.shape[0]):
+                    #print('in shape: ', masks[dim, :, :].shape)
+                    contours, hierarchy = cv2.findContours(image = masks[dim, :, :], mode = cv2.RETR_TREE, method = cv2.CHAIN_APPROX_NONE)
+                    cv2.drawContours(image = frame, contours=contours, contourIdx=-1, color=(0, 255, 0), thickness=1, lineType=cv2.LINE_AA)
           
-            #cv2.imshow('frame', frame)
-            #cv2.imshow('frame', colour_mask)
+                #cv2.imshow('frame', frame)
+                #cv2.imshow('frame', colour_mask)
         
-            # Write the combined frame to the output video
-            out_c.write(frame)
-            out_s.write(colour_mask)
+                # Write the combined frame to the output video
+                out_c.write(frame)
+                out_s.write(colour_mask)
+            else:
+                out_c.write(frame)
+                out_s.write(frame)
     
         # if cv2.waitKey(25) & 0xFF == ord('q'):
                 #break
