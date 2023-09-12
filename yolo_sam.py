@@ -112,7 +112,7 @@ if __name__ == '__main__':
     
     
     ## Load video
-    video_path  = os.path.join(os.getcwd(), 'src','classroom.mp4')
+    video_path  = os.path.join(os.getcwd(), 'src','20220729145913.mp4')
     cap = cv2.VideoCapture(video_path)
     #cap = cv2.VideoCapture(0)
     
@@ -127,23 +127,27 @@ if __name__ == '__main__':
     fps = int(cap.get(5))
 
     # # Define the output video path
-    output_path = os.path.join(os.getcwd(), 'output', 'processed_video2.mp4')
+    output_path_contours = os.path.join(os.getcwd(), 'output', '20220729145913_c.mp4')
+    output_path_segmentation = os.path.join(os.getcwd(), 'output', '20220729145913_s.mp4')
 
     # # Create a VideoWriter object to save the processed frames
     fourcc = cv2.VideoWriter_fourcc(*'mp4v')
-    out = cv2.VideoWriter(output_path, fourcc, fps, (frame_width, frame_height))
+    out_c = cv2.VideoWriter(output_path_contours, fourcc, fps, (frame_width, frame_height))
+    out_s = cv2.VideoWriter(output_path_segmentation, fourcc, fps, (frame_width, frame_height))
 
     while(cap.isOpened()):
         ret, frame = cap.read()
         try:
+           # frame2 = cv2.cvtColor(frame, cv2.COLOR_RGB2GRAY)
+            #frame2 = cv2.cvtColor((cv2.GaussianBlur(frame2, (3, 3), 0)), cv2.COLOR_GRAY2RGB)
             masks = process_frame(frame, yolo_model, predictor)
             #dispaly frame and colour mask in same window
             frame = ((frame/np.max(frame))*255).astype(np.uint8)
         
             
-            # colour_mask = optimized_show_mask(masks.detach().cpu().numpy())
+            colour_mask = optimized_show_mask(masks.detach().cpu().numpy())
        
-            # colour_mask = cv2.addWeighted(colour_mask.astype(np.uint8), 0.3, frame, 0.7, 0, dtype=cv2.CV_8U)#colour_mask.astype(np.uint8))
+            colour_mask = cv2.addWeighted(colour_mask.astype(np.uint8), 0.3, frame, 0.7, 0, dtype=cv2.CV_8U)#colour_mask.astype(np.uint8))
                 
             #-----------for contours -------
             masks = np.squeeze(masks.detach().cpu().numpy(), axis = 1).astype(np.uint8)
@@ -157,7 +161,8 @@ if __name__ == '__main__':
             #cv2.imshow('frame', colour_mask)
         
             # Write the combined frame to the output video
-            out.write(frame)
+            out_c.write(frame)
+            out_s.write(colour_mask)
     
         # if cv2.waitKey(25) & 0xFF == ord('q'):
                 #break
@@ -166,7 +171,8 @@ if __name__ == '__main__':
         ## save frame and make video
         except:
             i = i + 1
-            out.release()
+            out_c.release()
+            out_s.release()
             break
        
 
