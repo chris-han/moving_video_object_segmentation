@@ -125,10 +125,10 @@ if __name__ == '__main__':
             #frame2 = cv2.cvtColor((cv2.GaussianBlur(frame2, (3, 3), 0)), cv2.COLOR_GRAY2RGB)
             masks = process_frame(frame, yolo_model, predictor)
             #dispaly frame and colour mask in same window
-            frame = ((frame/np.max(frame))*255).astype(np.uint8)
+            
          
             if masks is not None:        
-        
+                frame = ((frame/np.max(frame))*255).astype(np.uint8)
                 colour_mask = optimized_show_mask(masks.detach().cpu().numpy())
        
                 colour_mask = cv2.addWeighted(colour_mask.astype(np.uint8), 0.3, frame, 0.7, 0, dtype=cv2.CV_8U)#colour_mask.astype(np.uint8))
