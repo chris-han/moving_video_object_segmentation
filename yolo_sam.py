@@ -95,7 +95,7 @@ if __name__ == '__main__':
     
     
     ## Load video
-    video_path  = os.path.join(os.getcwd(), 'src','20220729145913.mp4')
+    video_path  = os.path.join(os.getcwd(), 'src','classroom.mp4')
     cap = cv2.VideoCapture(video_path)
     #cap = cv2.VideoCapture(0)
     
@@ -110,8 +110,8 @@ if __name__ == '__main__':
     fps = int(cap.get(5))
 
     # # Define the output video path
-    output_path_contours = os.path.join(os.getcwd(), 'output', '20220729145913_c.mp4')
-    output_path_segmentation = os.path.join(os.getcwd(), 'output', '20220729145913_s.mp4')
+    output_path_contours = os.path.join(os.getcwd(), 'output', 'classroom_c.mp4')
+    output_path_segmentation = os.path.join(os.getcwd(), 'output', 'classroom_s.mp4')
 
     # # Create a VideoWriter object to save the processed frames
     fourcc = cv2.VideoWriter_fourcc(*'mp4v')
