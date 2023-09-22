@@ -5,8 +5,8 @@ import torch
 import torch.nn as nn
 
 
-from yolo_sam_v2_images import predict_segmentation
-
+from yolo_sam_v2_images import predict_segmentation_v2, predict_segmentation_v1
+from only_YOLOv8 import predict_segmentation_yolo
 
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -40,7 +40,7 @@ if __name__ == '__main__':
             segmentation = cv2.imread(segmentation_path)
             
             
-            predicted_segmentation = predict_segmentation(image)
+            predicted_segmentation = predict_segmentation_yolo(image)
             target_segmentation_torch = torch.from_numpy(segmentation).to(DEVICE)
             
             ## compress three channels into one, by taking the max value and assign 1 to the max value otherwise 0

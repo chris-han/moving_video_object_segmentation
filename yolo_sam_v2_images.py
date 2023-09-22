@@ -98,7 +98,38 @@ def process_frame2(frame, yolo=None, sam_predictor=None):
         )
     return masks #detections.mask
 
-def predict_segmentation(source_image):
+def predict_segmentation_v2(source_image):
+    """
+    Predict segmentation using YOLOv8 and SAM (optimized) version 2
+    args: source_image (np.ndarray) or (torch.tensor)
+    return: combined_mask (torch.tensor)
+    """
+    yolo_model = YOLO('yolov8x.pt').to(device)
+    
+    ## sam model
+    model_type = "vit_h"
+    sam = sam_model_registry[model_type](checkpoint=os.path.join(sam_checkpoints, vit_h))
+    sam = sam.to(device)
+    predictor = SamPredictor(sam)
+    
+    ## predict segmentation
+    masks = process_frame(source_image, yolo_model, predictor)
+    
+    ## take the maximum value from all the mask (torch tensor)
+    combined_mask = torch.max(masks, dim=0)[0]
+    
+    ## convert the [True, False] to [1, 0] (torch tensor)
+    combined_mask = combined_mask.type(torch.float32)
+    
+    return combined_mask
+    
+
+def predict_segmentation_v1(source_image):
+    """
+    Predict segmentation using YOLOv8 and SAM version 1
+    args: source_image (np.ndarray) or (torch.tensor)
+    return: combined_mask (torch.tensor)
+    """
     yolo_model = YOLO('yolov8x.pt').to(device)
     
     ## sam model
@@ -117,4 +148,3 @@ def predict_segmentation(source_image):
     combined_mask = combined_mask.type(torch.float32)
     
     return combined_mask
-    
