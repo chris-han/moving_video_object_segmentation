@@ -22,15 +22,18 @@ def dice_score(input, target, smooth=1.):
 
 if __name__ == '__main__':
     main_data_path = "D:\dataset\DAVIS"
-    selected_videos = [ 'parkour'] #'walking', 'hike', 'kid-football', 'tuk-tuk',
-    images_path = os.path.join(main_data_path, 'JPEGImages', 'Full-Resolution')
-    segmentation_path = os.path.join(main_data_path, 'Annotations_unsupervised', 'Full-Resolution')
+    selected_videos = [ 'parkour', 'kid-football']
     
-    mean_dice = 0
+    
+    mean_dice_score = 0
     
     for video in selected_videos:
+        images_path = os.path.join(main_data_path, 'JPEGImages', 'Full-Resolution')
+        segmentation_path = os.path.join(main_data_path, 'Annotations_unsupervised', 'Full-Resolution')
         full_images_path = os.path.join(images_path, video)
         full_segmentation_path = os.path.join(segmentation_path, video)
+        
+        mean_dice_Score_per_video = 0
         
         for image, segmentation in zip(os.listdir(full_images_path), os.listdir(full_segmentation_path)):
             image_path = os.path.join(full_images_path, image)
@@ -50,9 +53,11 @@ if __name__ == '__main__':
             
             dice = dice_score(predicted_segmentation, target_segmentation_torch.unsqueeze(0))
             
-            mean_dice += dice.detach().cpu().numpy()
-            
+            mean_dice_Score_per_video += dice.detach().cpu().numpy()
         
-    print('mean dice: ', mean_dice / len(selected_videos))
+        mean_dice_score += mean_dice_Score_per_video / len(os.listdir(full_images_path))
+    
+          
+    print('mean dice: ', mean_dice_score / len(selected_videos))
     
     

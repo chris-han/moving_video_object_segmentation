@@ -27,6 +27,9 @@ def predict_segmentation_yolo(source_image):
     ## predict segmentation
     masks = process_frame(source_image, yolo_model)
     combined_mask = masks.data
+    
+    ## combnine them to one mask
+    combined_mask = torch.max(combined_mask, dim=0)[0]
   
     return combined_mask
     

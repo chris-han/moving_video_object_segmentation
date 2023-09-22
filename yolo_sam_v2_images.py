@@ -113,13 +113,10 @@ def predict_segmentation_v2(source_image):
     predictor = SamPredictor(sam)
     
     ## predict segmentation
-    masks = process_frame(source_image, yolo_model, predictor)
+    masks = process_frame2(source_image, yolo_model, predictor)
     
     ## take the maximum value from all the mask (torch tensor)
     combined_mask = torch.max(masks, dim=0)[0]
-    
-    ## convert the [True, False] to [1, 0] (torch tensor)
-    combined_mask = combined_mask.type(torch.float32)
     
     return combined_mask
     
@@ -139,8 +136,11 @@ def predict_segmentation_v1(source_image):
     predictor = SamPredictor(sam)
     
     ## predict segmentation
-    masks = process_frame2(source_image, yolo_model, predictor)
+    masks = process_frame(source_image, yolo_model, predictor)
     
+    if masks is None:
+        combined_mask = torch.zeros(source_image.shape[:2])
+        return combined_mask.unsqueeze(0).to(device)
     ## take the maximum value from all the mask (torch tensor)
     combined_mask = torch.max(masks, dim=0)[0]
     
