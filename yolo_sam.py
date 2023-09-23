@@ -95,7 +95,7 @@ if __name__ == '__main__':
     
     
     ## Load video
-    video_path  = os.path.join(os.getcwd(), 'src','classroom.mp4')
+    video_path  = os.path.join(os.getcwd(), 'src','output1024_crop.mp4')
     cap = cv2.VideoCapture(video_path)
     #cap = cv2.VideoCapture(0)
     
@@ -141,18 +141,23 @@ if __name__ == '__main__':
                     contours, hierarchy = cv2.findContours(image = masks[dim, :, :], mode = cv2.RETR_TREE, method = cv2.CHAIN_APPROX_NONE)
                     cv2.drawContours(image = frame, contours=contours, contourIdx=-1, color=(0, 255, 0), thickness=1, lineType=cv2.LINE_AA)
           
-                #cv2.imshow('frame', frame)
-                #cv2.imshow('frame', colour_mask)
-        
+                       
                 # Write the combined frame to the output video
                 out_c.write(frame)
                 out_s.write(colour_mask)
+                cv2.imshow('frame', frame)
+                cv2.imshow('frame', colour_mask)    
+                # add cv2.waitKey()   
+
+
             else:
                 out_c.write(frame)
                 out_s.write(frame)
+                cv2.imshow('frame', frame)
+                
     
-        # if cv2.waitKey(25) & 0xFF == ord('q'):
-                #break
+            if cv2.waitKey(25) & 0xFF == ord('q'):
+                break
     
             i = i + 1
         ## save frame and make video
